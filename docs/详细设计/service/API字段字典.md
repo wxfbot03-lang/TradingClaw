@@ -53,10 +53,14 @@
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | `user_id` | string | 用户唯一标识 |
+| `instrument_id` | string | 标的统一唯一标识 |
 | `session_id` | string | 登录会话 ID |
+| `trading_session_id` | string | 统一交易会话 ID |
+| `session_ref` | string | 外部会话引用或适配层会话标识 |
 | `account_id` | string | 统一交易账户 ID |
 | `strategy_instance_id` | string | 用户策略实例 ID |
 | `strategy_definition_id` | string | 策略模板定义 ID |
+| `captcha_job_id` | string | 验证码任务 ID |
 | `order_id` | string | 统一订单 ID |
 | `channel_order_id` | string | 外部通道订单号 |
 | `conversation_id` | string | AI 会话 ID |
@@ -74,21 +78,35 @@
 | `identity_type` | string | 登录身份类型，如 `email`、`phone`、`username` |
 | `principal` | string | 登录主体，如邮箱、手机号、用户名 |
 | `credential` | string | 登录凭据，如密码或动态认证码 |
-| `access_token` | string | 访问令牌 |
+| `access_token` | string | 统一访问令牌，HTTP Bearer、WebSocket 握手和内部会话校验均使用该值 |
 | `expires_at` | string(datetime) | 过期时间 |
+| `client_type` | string | 客户端类型，如 `web`、`cli`、`ai` |
+| `required_scope` | array/string | 会话校验时要求的权限范围 |
 | `level` | string | 用户等级 |
+| `account_type` | string | 账户类型，如 `security`、`crypto` |
 | `strategy_quota_total` | integer | 策略总额度 |
 | `strategy_quota_used` | integer | 已占用策略额度 |
 | `points_total` | number | 总积分 |
 | `points_available` | number | 可用积分 |
 | `binding_status` | string | 账户绑定状态 |
-| `session_status` | string | 会话状态 |
+| `auth_session_status` | string | 登录会话状态 |
+| `trading_session_status` | string | 交易会话状态 |
 | `owned` | boolean | 是否归属当前用户 |
+| `valid` | boolean | 校验结果是否有效 |
+| `revoked` | boolean | 是否已吊销或注销成功 |
+| `unbound` | boolean | 是否已解绑成功 |
 | `credential_ref` | string | 密钥或凭据引用 |
 | `broker_code` | string | 券商编码 |
 | `account_no` | string | 外部账户号 |
+| `captcha_text` | string | 验证码文本 |
 | `capabilities` | object | 账户能力矩阵 |
+| `default_trading_session_id` | string | 默认交易会话 ID，仅允许引用 `AVAILABLE` 的统一交易会话 |
 | `set_as_default` | boolean | 是否设为默认交易会话 |
+| `account_capability_status` | string | 账户能力可用状态，如 `pending_verify`、`enabled`、`disabled`、`degraded` |
+| `user_summary` | object | 登录响应中的用户摘要 |
+| `profile` | object | 用户资料聚合对象 |
+| `quota_summary` | object | 用户额度摘要 |
+| `points_summary` | object | 用户积分摘要 |
 
 ## 7. 行情与资讯字段字典
 
@@ -96,6 +114,8 @@
 | --- | --- | --- |
 | `symbol` | string | 标的代码 |
 | `symbols` | array/string | 多个标的代码集合 |
+| `instrument_id` | string | 标的统一唯一标识，用于事件分区、跨域关联、缓存主键和内部引用 |
+| `instrument_ids` | array/string | 多个标的统一唯一标识集合，标准批量查询优先使用 |
 | `market` | string | 市场代码，如 `SSE` |
 | `asset_class` | string | 资产类型，如 `SECURITY`、`CRYPTO` |
 | `price` | number | 价格 |
@@ -106,7 +126,7 @@
 | `period` | string | 行情周期，如 `1m`、`1d` |
 | `start_at` | string(datetime) | 区间起始时间 |
 | `end_at` | string(datetime) | 区间结束时间 |
-| `data_status` | string | 数据状态，如 `fresh`、`cache_fallback` |
+| `data_status` | string | 数据状态，如 `fresh`、`cache_fallback`、`partial`、`unavailable` |
 | `indicator_type` | string | 指标类型，如 `ma` |
 | `window` | integer | 指标窗口 |
 | `calculable` | boolean | 是否可计算 |
@@ -124,22 +144,34 @@
 | --- | --- | --- |
 | `side` | string | 买卖方向，如 `BUY`、`SELL` |
 | `order_type` | string | 订单类型，如 `LIMIT`、`MARKET` |
+| `time_in_force` | string | 订单时效，如 `DAY`、`GTC`、`IOC`、`FOK` |
+| `session_scope` | string | 交易时段范围，如 `REGULAR`、`PRE_MARKET`、`POST_MARKET` |
 | `accepted` | boolean | 是否被受理 |
 | `cancel_requested` | boolean | 是否已提交撤单 |
+| `closed` | boolean | 会话或资源是否已关闭 |
+| `written` | boolean | 写入或设置动作是否成功 |
+| `cleared` | boolean | 清理动作是否成功 |
+| `default_trading_session_written` | boolean | 默认交易会话引用是否已成功写入账户域 |
 | `status` | string | 标准化业务状态 |
+| `idempotency_key` | string | 命令请求幂等键 |
 | `reason_code` | string | 结构化失败原因码 |
 | `filled_quantity` | number | 已成交数量 |
 | `avg_fill_price` | number | 成交均价 |
 | `available_quantity` | number | 可用持仓数量 |
 | `cost_price` | number | 成本价 |
+| `reduce_only` | boolean | 是否仅允许减仓 |
+| `leverage` | number | 杠杆倍数 |
 | `currency` | string | 币种 |
 | `available` | number | 可用余额 |
 | `frozen` | number | 冻结余额 |
 | `instrument` | object | 统一标的对象 |
 | `channel_order_request` | object | 通道适配层原始下单参数对象 |
 | `raw_status` | string | 外部通道原始状态 |
+| `adapter_session_status` | string | 适配侧会话状态，不等同于统一交易会话状态 |
 | `normalized_report` | object | 标准化执行回报 |
 | `broker_session_id` | string | 券商侧会话标识 |
+| `asset_summary` | object | 资产汇总对象 |
+| `positions` | array | 持仓集合 |
 
 ## 9. 策略字段字典
 
@@ -152,12 +184,15 @@
 | `latest_snapshot_version` | integer | 最新快照版本 |
 | `operator_reason` | string | 人工操作说明 |
 | `target_action` | string | 目标动作，如 `start`、`stop`、`archive` |
+| `signal_id` | string | 策略信号 ID |
 | `signal` | object | 计算信号 |
 | `signal_type` | string | 信号类型 |
+| `plan_id` | string | 交易计划 ID |
 | `trading_plan` | object | 待执行交易计划 |
 | `market_snapshot` | object | 市场快照 |
 | `account_snapshot` | object | 账户快照 |
 | `position_snapshot` | object | 持仓快照 |
+| `strategy_detail` | object | 策略详情聚合对象 |
 
 ## 10. 智能能力字段字典
 
@@ -173,6 +208,7 @@
 | `model_id` | string | 模型 ID |
 | `provider_code` | string | 模型或 OCR 供应商标识 |
 | `enabled` | boolean | 是否启用 |
+| `capability_status` | string | 能力开放状态 |
 | `image_ref` | string | 图片引用 |
 | `scene` | string | OCR 场景 |
 | `text` | string | OCR 识别结果 |
@@ -186,18 +222,29 @@
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | `resource_type` | string | 被作用资源类型 |
-| `resource_id` | string | 被作用资源 ID |
-| `resource_ref` | string | 资源引用组合键 |
+| `resource_id` | string | 被作用资源 ID；在预创建资源场景可为空 |
+| `actor_id` | string | 操作主体 ID |
+| `resource_ref` | string | 资源引用组合键，风控与审计链路必填 |
 | `action_type` | string | 操作类型 |
 | `payload` | object | 风险或审计上下文载荷 |
 | `payload_ref` | string | 审计大对象引用 |
 | `allowed` | boolean | 是否允许执行 |
 | `decision` | string | 风控或复核决策 |
 | `review_required` | boolean | 是否需要人工复核 |
+| `risk_event_id` | string | 风险事件 ID |
+| `rule_code` | string | 风控规则编码 |
+| `rule_version` | integer | 风控规则版本 |
 | `severity` | string | 风险等级 |
 | `comment` | string | 复核备注 |
+| `resume_token` | string | 恢复原流程的引用令牌 |
+| `notification_type` | string | 通知类型 |
+| `business_key` | string | 通知业务去重键 |
+| `notification_status` | string | 通知主记录状态 |
+| `delivery_status` | string | 投递记录状态 |
+| `target_ref` | string | 通知目标引用 |
 | `channel` | string | 通知渠道 |
 | `recorded` | boolean | 审计是否写入成功 |
+| `delivered_at` | string(datetime) | 通知投递完成时间 |
 | `created_at` | string(datetime) | 创建时间 |
 
 ## 12. 可观测字段字典
@@ -236,9 +283,11 @@
 ### 13.4 常见状态字段
 
 - `status`：统一业务状态字段，必须使用标准化值
-- `session_status`：登录会话或交易会话状态，需结合上下文解释
+- `auth_session_status`：登录会话状态
+- `trading_session_status`：交易会话状态
 - `runtime_status`：策略运行时状态
 - `binding_status`：账户绑定状态
+- `capability_status`：能力开放状态
 
 ## 14. 使用规则
 
