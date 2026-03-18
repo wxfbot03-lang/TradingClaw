@@ -106,7 +106,16 @@
 | `adapter_session_mode` | string | 适配会话模式，如 `STATEFUL_SESSION`、`STATELESS_SIGNED`、`REFRESHABLE_TOKEN` |
 | `challenge_mode` | string | 认证挑战方式，如 `NONE`、`IMAGE_CAPTCHA`、`SMS_OTP`、`TOTP` |
 | `secret_schema` | string | 凭据内容结构标识，如 `username_password_captcha_v1` |
-| `broker_code` | string | 券商编码 |
+| `auth_flow_id` | string | 交易会话认证流程 ID |
+| `step_code` | string | 当前认证步骤编码 |
+| `step_title` | string | 当前认证步骤标题 |
+| `required_fields` | array | 当前步骤要求用户补充的输入字段定义 |
+| `fields` | object | 当前步骤提交的用户输入内容 |
+| `artifacts` | object | 当前步骤返回的验证码图片、短信目标等辅助材料 |
+| `challenge_required` | boolean | 当前认证是否需要用户继续补充步骤输入 |
+| `completed` | boolean | 当前认证流程是否已完成 |
+| `sms_code` | string | 短信验证码文本 |
+| `broker_code` | string | 券商专用编码，兼容保留；新增接入设计统一使用 `provider_code` |
 | `account_no` | string | 外部账户号 |
 | `captcha_text` | string | 验证码文本 |
 | `capabilities` | object | 账户能力矩阵 |
